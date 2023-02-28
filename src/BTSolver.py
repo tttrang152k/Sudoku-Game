@@ -131,7 +131,23 @@ class BTSolver:
         Return: The unassigned variable with the smallest domain
     """
     def getMRV ( self ):
-        return None
+        unassignedVars = []
+        # Getting all the unassigned variables
+        for var in self.network.getVariables():
+            if not var.isAssigned():   
+                unassignedVars.append(var)
+        if len(unassignedVars) != 0:
+            minValues = unassignedVars[0].domain.size()   # initial min value
+            mrv = None                                    # initial mrv
+            # check number of values in the domain of each unassigned variable
+            # and get the mrv variable
+            for uv in unassignedVars:
+                if uv.domain.size() <= minValues:
+                    minValues = uv.domain.size()
+                    mrv = uv
+            return mrv
+        else:
+            return None
 
     """
         Part 2 TODO: Implement the Minimum Remaining Value Heuristic
