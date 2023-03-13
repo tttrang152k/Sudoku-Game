@@ -101,7 +101,54 @@ class BTSolver:
                 The bool is true if assignment is consistent, false otherwise.
     """
     def norvigCheck ( self ):
-        return ({}, False)
+	assignedVar={};
+        for var in self.network.getVariables():
+            assignedVal=var.getAssignment()
+            if assignedVal:
+                for neighbor in self.network.getNeighborsOfVariable(var):
+                    if neighbor.getDomain().contains(assignedVal):
+                        self.trail.push(neighbor)
+                        neighbor.removeValueFromDomain(assignedVal)
+                        domain=neighbor.getDomain()
+                        if domain.isEmpty():
+                            return (assignedVar, False)
+                        
+                        if domain.size() == 1:
+                            value=domain.values[0]
+                            neighbor.assignValue(value)
+                            assignedVar[neighbor]=value
+                            
+        if not self.network.isConsistent():
+            return (assignedVar, False)
+
+        for unit in self.network.getConstraints(): 
+            counter=dict()
+            length=0
+            
+            for var in set(unit.vars):
+                for val in set(var.getValues()):
+                    if val not in counter:
+                        counter[val]=[1,var]
+                        length+=1
+                    else:
+                        counter[val][0]+=1
+                        
+            if length<self.gameboard.N:
+                return (assignedVar, False)
+                        
+ 
+            for k,v in counter.items():
+                if v[0] == 1:
+                    if not v[1].isAssigned() and v[1].getDomain().contains(k):
+                        self.trail.push(v[1])
+                        v[1].assignValue(k)
+                        assignedVar[v[1]]=k
+                        
+            if not self.network.isConsistent():
+                return (assignedVar, False)
+            
+        
+        return (assignedVar, self.network.isConsistent())
 
     """
          Optional TODO: Implement your own advanced Constraint Propagation
