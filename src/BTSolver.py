@@ -118,8 +118,6 @@ class BTSolver:
                             neighbor.assignValue(value)
                             assignedVar[neighbor]=value
                             
-        if not self.network.isConsistent():
-            return (assignedVar, False)
 
         for unit in self.network.getConstraints(): 
             counter=dict()
@@ -143,9 +141,6 @@ class BTSolver:
                         self.trail.push(v[1])
                         v[1].assignValue(k)
                         assignedVar[v[1]]=k
-                        
-            if not self.network.isConsistent():
-                return (assignedVar, False)
             
         
         return (assignedVar, self.network.isConsistent())
