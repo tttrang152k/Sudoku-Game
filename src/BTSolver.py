@@ -123,8 +123,8 @@ class BTSolver:
             counter=dict()
             length=0
             
-            for var in set(unit.vars):
-                for val in set(var.getValues()):
+            for var in unit.vars:
+                for val in var.getValues():
                     if val not in counter:
                         counter[val]=[1,var]
                         length+=1
