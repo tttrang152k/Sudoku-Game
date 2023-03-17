@@ -207,8 +207,6 @@ class BTSolver:
                 unassignedVars.append(var)
         if len(unassignedVars) != 0:
             minValues = unassignedVars[0].domain.size()   # initial min value
-            # check number of values in the domain of each unassigned variable
-            # and get the mrv variable
             for uv in unassignedVars:
                 if uv.domain.size() < minValues:
                     minValues = uv.domain.size()
@@ -221,11 +219,9 @@ class BTSolver:
                     if not neighbor.isAssigned():
                         tempDict[var]+=1
 
-            #max_tuple = max(tempDict.items(), key = lambda x:x[1])
-            #return [k[0] for k in tempDict.items() if k[1]==max_tuple[1]]
             return [keys for keys, value in tempDict.items() if value == max(tempDict.values())]
         else:
-            return None
+            return [None]
 
     """
          Optional TODO: Implement your own advanced Variable Heuristic
