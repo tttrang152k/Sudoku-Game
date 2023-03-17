@@ -101,7 +101,7 @@ class BTSolver:
                 The bool is true if assignment is consistent, false otherwise.
     """
     def norvigCheck ( self ):
-	assignedVar={};
+        assignedVar={}
         for var in self.network.getVariables():
             assignedVal=var.getAssignment()
             if assignedVal:
@@ -177,14 +177,14 @@ class BTSolver:
         # Getting all the unassigned variables
         for var in self.network.getVariables():
             if not var.isAssigned():   
-                unassignedVars.append(var)       
+                unassignedVars.append(var)
         if len(unassignedVars) != 0:
             minValues = unassignedVars[0].domain.size()   # initial min value
-            mrv = unassignedVars[0]                       # initial mrv
+            mrv = None                                    # initial mrv
             # check number of values in the domain of each unassigned variable
             # and get the mrv variable
             for uv in unassignedVars:
-                if uv.domain.size() < minValues:
+                if uv.domain.size() <= minValues:
                     minValues = uv.domain.size()
                     mrv = uv
             return mrv
@@ -195,12 +195,33 @@ class BTSolver:
         Part 2 TODO: Implement the Minimum Remaining Value Heuristic
                        with Degree Heuristic as a Tie Breaker
 
-        Return: The unassigned variable with the smallest domain and affecting the  most unassigned neighbors.
+        Return: The unassigned variable with the smallest domain and affecting the most unassigned neighbors.
                 If there are multiple variables that have the same smallest domain with the same number of unassigned neighbors, add them to the list of Variables.
                 If there is only one variable, return the list of size 1 containing that variable.
     """
     def MRVwithTieBreaker ( self ):
-        return None
+        unassignedVars = []
+        # Getting all the unassigned variables
+        for var in self.network.getVariables():
+            if not var.isAssigned():   
+                unassignedVars.append(var)
+        if len(unassignedVars) != 0:
+            minValues = unassignedVars[0].domain.size()   # initial min value
+            for uv in unassignedVars:
+                if uv.domain.size() < minValues:
+                    minValues = uv.domain.size()
+            minDomainList = [uv for uv in unassignedVars if uv.domain.size() == minValues]
+
+            tempDict = dict.fromkeys(minDomainList, 0)
+
+            for var in minDomainList:
+                for neighbor in self.network.getNeighborsOfVariable(var):
+                    if not neighbor.isAssigned():
+                        tempDict[var]+=1
+
+            return [keys for keys, value in tempDict.items() if value == max(tempDict.values())]
+        else:
+            return [None]
 
     """
          Optional TODO: Implement your own advanced Variable Heuristic
@@ -230,14 +251,14 @@ class BTSolver:
                 The LCV is first and the MCV is last
     """
     def getValuesLCVOrder ( self, v ):
-	result=dict.fromkeys(v.domain.values, 0)
+        result=dict.fromkeys(v.domain.values, 0)
 
-	for neighbor in self.network.getNeighborsOfVariable(v):
-		for value in neighbor.domain.values:
-			if value in v.domain.values:
-		    		result[value]+=1
+        for neighbor in self.network.getNeighborsOfVariable(v):
+            for value in neighbor.domain.values:
+                if value in v.domain.values:
+                    result[value]+=1
 
-	return [value[0] for value in sorted(result.items(),key=lambda x:x[1])]
+        return [value[0] for value in sorted(result.items(),key=lambda x:x[1])]
 
     """
          Optional TODO: Implement your own advanced Value Heuristic
