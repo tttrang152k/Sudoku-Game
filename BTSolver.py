@@ -205,21 +205,23 @@ class BTSolver:
         for var in self.network.getVariables():
             if not var.isAssigned():   
                 unassignedVars.append(var)
+        """
         if len(unassignedVars) != 0:
             minValues = unassignedVars[0].domain.size()   # initial min value
             for uv in unassignedVars:
                 if uv.domain.size() < minValues:
                     minValues = uv.domain.size()
+
             minDomainList = [uv for uv in unassignedVars if uv.domain.size() == minValues]
 
-            """tempDict = dict.fromkeys(minDomainList, 0)
+            tempDict = dict.fromkeys(minDomainList, 0)
 
             for var in minDomainList:
                 for neighbor in self.network.getNeighborsOfVariable(var):
                     if not neighbor.isAssigned():
                         tempDict[var]+=1
 
-            return [keys for keys, value in tempDict.items() if value == max(tempDict.values())]"""
+            return [keys for keys, value in tempDict.items() if value == max(tempDict.values())]
             
             tempList = [0 for _ in range(len(minDomainList))]
             for i in range(len(minDomainList)):
@@ -228,9 +230,40 @@ class BTSolver:
                         tempList[i]+=1
             max_value = max(tempList)
             index_value = [i for i in range(len(tempList)) if tempList[i] == max_value]
+        
+            return [minDomainList[i] for i in index_value]
 
-            mrvList = [minDomainList[i] for i in index_value]
-            return mrvList
+            """
+        minDomainList = []
+        neighborsList = []
+        minFound = False
+
+        if len(unassignedVars) != 0:
+            minValues = unassignedVars[0].domain.size()   # initial min value
+            for uv in unassignedVars:
+                if uv.domain.size() > minValues:
+                    continue
+                elif uv.domain.size() == minValues:
+                    minDomainList.append(uv)
+                elif uv.domain.size() < minValues:
+                    minDomainList.clear()
+                    minDomainList.append(uv)
+                    minValues = uv.domain.size()
+                    minFound = True
+                if minFound:
+                    neighborsList.clear()
+                    minFound = False
+                count = 0
+                for neighbor in self.network.getNeighborsOfVariable(uv):
+                    if not neighbor.isAssigned():
+                        count+=1
+                neighborsList.append(count)
+
+            max_value = max(neighborsList)
+            index_value = [i for i in range(len(neighborsList)) if neighborsList[i] == max_value]
+        
+            return [minDomainList[i] for i in index_value]
+
         else:
             return [None]
 
