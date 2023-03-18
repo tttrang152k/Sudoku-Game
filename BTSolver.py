@@ -212,14 +212,25 @@ class BTSolver:
                     minValues = uv.domain.size()
             minDomainList = [uv for uv in unassignedVars if uv.domain.size() == minValues]
 
-            tempDict = dict.fromkeys(minDomainList, 0)
+            """tempDict = dict.fromkeys(minDomainList, 0)
 
             for var in minDomainList:
                 for neighbor in self.network.getNeighborsOfVariable(var):
                     if not neighbor.isAssigned():
                         tempDict[var]+=1
 
-            return [keys for keys, value in tempDict.items() if value == max(tempDict.values())]
+            return [keys for keys, value in tempDict.items() if value == max(tempDict.values())]"""
+            
+            tempList = [0 for _ in range(len(minDomainList))]
+            for i in range(len(minDomainList)):
+                for neighbor in self.network.getNeighborsOfVariable(minDomainList[i]):
+                    if not neighbor.isAssigned():
+                        tempList[i]+=1
+            max_value = max(tempList)
+            index_value = [i for i in range(len(tempList)) if tempList[i] == max_value]
+
+            mrvList = [minDomainList[i] for i in index_value]
+            return mrvList
         else:
             return [None]
 
